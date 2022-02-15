@@ -1,0 +1,28 @@
+url = "/movies/movie/:slug"
+layout = "home"
+title = "Movie single"
+
+[builderDetails]
+modelClass = "Test\Movies\Models\Movie"
+identifierValue = "{{ :slug }}"
+modelKeyColumn = "slug"
+displayColumn = "name"
+notFoundMessage = "Record not found"
+==
+{% set record = builderDetails.record %}
+{% set displayColumn = builderDetails.displayColumn %}
+{% set notFoundMessage = builderDetails.notFoundMessage %}
+
+{% if record %}
+    <h2>{{ record.name }}</h2>
+
+    <img src="{{ record.poster.thumb(200,auto) }}">
+
+    <h4>{{ record.year }}</h4>
+
+    <h3>description</h3>
+
+    {{ record.description|raw }}
+{% else %}
+    {{ notFoundMessage }}
+{% endif %}

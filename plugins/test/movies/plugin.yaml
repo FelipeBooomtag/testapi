@@ -1,0 +1,11 @@
+plugin:
+    name: 'test.movies::lang.plugin.name'
+    description: 'test.movies::lang.plugin.description'
+    author: test
+    icon: oc-icon-video-camera
+    homepage: ''
+navigation:
+    main-menu-item:
+        label: Movies
+        url: test/movies/movies
+        icon: icon-video-camera
