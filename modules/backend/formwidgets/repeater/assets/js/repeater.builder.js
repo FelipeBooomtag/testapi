@@ -122,8 +122,6 @@
                 itemIndex = $item.data('repeater-index'),
                 $groupItem = $('> li[data-repeater-index='+itemIndex+']', self.$sidebar);
 
-            console.log(self.getCollapseTitle($item));
-
             $('[data-group-title]:first', $groupItem).html(self.getCollapseTitle($item));
         });
     }

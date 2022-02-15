@@ -2,9 +2,12 @@
 
 use Block;
 use Event;
-use Twig\Extension\AbstractExtension as TwigExtension;
+use Redirect;
 use Twig\TwigFilter as TwigSimpleFilter;
 use Twig\TwigFunction as TwigSimpleFunction;
+use Twig\Extension\AbstractExtension as TwigExtension;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Cms\Classes\Controller;
 
 /**
@@ -40,11 +43,12 @@ class Extension extends TwigExtension
             new TwigSimpleFunction('content', [$this, 'contentFunction'], ['is_safe' => ['html']]),
             new TwigSimpleFunction('component', [$this, 'componentFunction'], ['is_safe' => ['html']]),
             new TwigSimpleFunction('placeholder', [$this, 'placeholderFunction'], ['is_safe' => ['html']]),
+            new TwigSimpleFunction('abort', [$this, 'abortFunction'], []),
         ];
     }
 
     /**
-     * getFilters returns a list of filters this extensions provides.
+     * getFilters returns a list of filters this extension provides.
      * @return array
      */
     public function getFilters()
@@ -56,7 +60,7 @@ class Extension extends TwigExtension
     }
 
     /**
-     * getTokenParsers returns a list of token parsers this extensions provides.
+     * getTokenParsers returns a list of token parsers this extension provides.
      * @return array
      */
     public function getTokenParsers()
@@ -73,6 +77,17 @@ class Extension extends TwigExtension
             new FlashTokenParser,
             new ScriptsTokenParser,
             new StylesTokenParser,
+        ];
+    }
+
+    /**
+     * getNodeVisitors returns a list of node visitors this extension provides.
+     * @return array
+     */
+    public function getNodeVisitors()
+    {
+        return [
+            new GetAttrAdjuster
         ];
     }
 
@@ -147,6 +162,31 @@ class Extension extends TwigExtension
         $result = str_replace('<!-- X_OCTOBER_DEFAULT_BLOCK_CONTENT -->', trim($default), $result);
 
         return $result;
+    }
+
+    /**
+     * abortFunction will abort the successful page cycle
+     * @param int $code
+     * @param string|false $message
+     */
+    public function abortFunction($code, $message = '')
+    {
+        if ($message === false) {
+            $this->controller->setStatusCode($code);
+            return;
+        }
+
+        if (($code == 302 || $code == 301) && $message) {
+            $url = $this->controller->pageUrl($message) ?: $message;
+            $this->controller->setResponse(Redirect::to($url, $code));
+            return;
+        }
+
+        if ($code == 404) {
+            throw new NotFoundHttpException($message);
+        }
+
+        throw new HttpException($code, $message);
     }
 
     /**

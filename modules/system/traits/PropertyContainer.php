@@ -67,7 +67,7 @@ trait PropertyContainer
      */
     public function setProperty($name, $value)
     {
-        $this->properties[$name] = $value;
+        array_set($this->properties, $name, $value);
     }
 
     /**
@@ -87,9 +87,7 @@ trait PropertyContainer
      */
     public function property($name, $default = null)
     {
-        return array_key_exists($name, $this->properties)
-            ? $this->properties[$name]
-            : $default;
+        return array_get($this->properties, $name, $default);
     }
 
     /**

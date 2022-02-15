@@ -25,8 +25,10 @@ final class SecurityPolicy implements SecurityPolicyInterface
      * @var array blockedClasses is a list of forbidden classes
      */
     protected $blockedClasses = [
+        \Twig\Environment::class,
         \Illuminate\Filesystem\Filesystem::class,
-        \Illuminate\Session\FileSessionHandler::class
+        \Illuminate\Session\FileSessionHandler::class,
+        \Illuminate\Contracts\Filesystem\Filesystem::class
     ];
 
     /**
@@ -38,8 +40,8 @@ final class SecurityPolicy implements SecurityPolicyInterface
      * @var array blockedMethods is a list of forbidden methods
      */
     protected $blockedMethods = [
-        // Prevent manipulating Twig itself
-        'getTwig',
+        // Prevent magic bypass
+        '__call',
 
         // Prevent dynamic methods and props
         'addDynamicMethod',
@@ -85,7 +87,7 @@ final class SecurityPolicy implements SecurityPolicyInterface
      * checkSecurity
      * @throws SecurityError
      */
-    public function checkSecurity($tags, $filters, $functions)
+    public function checkSecurity($tags, $filters, $functions): void
     {
     }
 
@@ -93,7 +95,7 @@ final class SecurityPolicy implements SecurityPolicyInterface
      * checkMethodAllowed
      * @throws SecurityNotAllowedMethodError
      */
-    public function checkMethodAllowed($obj, $method)
+    public function checkMethodAllowed($obj, $method): void
     {
         if ($obj instanceof Template || $obj instanceof Markup) {
             return;
@@ -126,7 +128,7 @@ final class SecurityPolicy implements SecurityPolicyInterface
      * checkPropertyAllowed
      * @throws SecurityNotAllowedPropertyError
      */
-    public function checkPropertyAllowed($obj, $property)
+    public function checkPropertyAllowed($obj, $property): void
     {
         if (in_array($property, $this->blockedProperties)) {
             $class = get_class($obj);

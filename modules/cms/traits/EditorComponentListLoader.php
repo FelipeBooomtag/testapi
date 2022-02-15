@@ -1,10 +1,10 @@
 <?php namespace Cms\Traits;
 
-use Exception;
 use Cms\Classes\ComponentManager;
 use Cms\Classes\ComponentHelpers;
 use Cms\Classes\CmsCompoundObject;
 use Cms\Components\ViewBag;
+use Exception;
 
 /**
  * EditorComponentListLoader loads components the CMS Editor Extension
@@ -95,6 +95,10 @@ trait EditorComponentListLoader
     private function makeTemplateComponent($manager, $name, $properties, $alias)
     {
         $componentObj = $manager->makeComponent($name, null, $properties);
+        if (!$componentObj) {
+            throw new Exception('Component not found');
+        }
+
         $componentObj->alias = $alias;
 
         $propertyConfig = ComponentHelpers::getComponentsPropertyConfig($componentObj, true, true);

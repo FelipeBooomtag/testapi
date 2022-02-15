@@ -69,11 +69,8 @@ class Repeater extends FormWidgetBase
     public $displayMode;
 
     /**
-     * @var string style of the repeater. Can be one of three values:
-     *  - "default": Shows all repeater items expanded on load.
-     *  - "collapsed": Shows all repeater items collapsed on load.
-     *  - "accordion": Shows only the first repeater item expanded on load. When another item is clicked, all other open
-     *      items are collapsed.
+     * @var string style
+     * @deprecated
      */
     public $style;
 
@@ -133,6 +130,7 @@ class Repeater extends FormWidgetBase
     {
         $this->fillFromConfig([
             'form',
+            // @deprecated
             'style',
             'prompt',
             'displayMode',
@@ -195,6 +193,7 @@ class Repeater extends FormWidgetBase
         $this->vars['groupKeyFrom'] = $this->groupKeyFrom;
         $this->vars['minItems'] = $this->minItems;
         $this->vars['maxItems'] = $this->maxItems;
+        // @deprecated
         $this->vars['style'] = $this->style;
         $this->vars['useRelation'] = $this->useRelation;
         $this->vars['useGroups'] = $this->useGroups;

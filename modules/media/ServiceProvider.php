@@ -62,12 +62,12 @@ class ServiceProvider extends ModuleServiceProvider
         BackendMenu::registerCallback(function ($manager) {
             $manager->registerMenuItems('October.Media', [
                 'media' => [
-                    'label'       => 'backend::lang.media.menu_label',
-                    'icon'        => 'icon-folder',
-                    'iconSvg'     => 'modules/media/assets/images/media-icon.svg',
-                    'url'         => Backend::url('media'),
+                    'label' => 'backend::lang.media.menu_label',
+                    'icon' => 'icon-folder',
+                    'iconSvg' => 'modules/media/assets/images/media-icon.svg',
+                    'url' => Backend::url('media'),
                     'permissions' => ['media.*'],
-                    'order'       => 200
+                    'order' => 200
                 ]
             ]);
         });

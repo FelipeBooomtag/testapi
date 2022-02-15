@@ -28,109 +28,107 @@ trait ParsableController
     /**
      * parseRouteParamsOnComponent where property values should be defined as {{ :param }}.
      */
-    protected function parseRouteParamsOnComponent(ComponentBase $component)
+    protected function parseRouteParamsOnComponent(ComponentBase $component, array $params = [], array $properties = null, string $propPrefix = '')
     {
-        $properties = $component->getProperties();
+        $properties = $properties ?: $component->getProperties();
 
-        // Apply external route parameters
-        $routerParameters = $this->router->getParameters();
-        $overrides = $this->makeRouterPropertyReplacements($properties, $routerParameters);
+        foreach ($properties as $propName => $propValue) {
+            if (is_array($propValue)) {
+                $this->parseRouteParamsOnComponent($component, $params, $propValue, $propName.'.');
+                continue;
+            }
 
-        foreach ($overrides as $propertyName => $override) {
-            $component->setProperty($propertyName, $override[1]);
-            $component->setExternalPropertyName($propertyName, $override[0]);
+            if ($override = $this->makeRouterPropertyReplacement($propValue, $params)) {
+                [$paramName, $newValue] = $override;
+                $component->setProperty($propPrefix.$propName, $newValue);
+                $component->setExternalPropertyName($propPrefix.$propName, $paramName);
+            }
         }
     }
 
     /**
      * parseEnvironmentVarsOnComponent where property values should be defined as {{ param }}.
      */
-    protected function parseEnvironmentVarsOnComponent(ComponentBase $component, array $vars = [])
+    protected function parseEnvironmentVarsOnComponent(ComponentBase $component, array $vars = [], array $properties = null, string $propPrefix = '')
     {
-        $properties = $component->getProperties();
+        $properties = $properties ?: $component->getProperties();
 
-        // Apply environment variables
-        $overrides = $this->makeDynamicAttributeReplacements($properties, $vars);
+        foreach ($properties as $propName => $propValue) {
+            if (is_array($propValue)) {
+                $this->parseEnvironmentVarsOnComponent($component, $vars, $propValue, $propName.'.');
+                continue;
+            }
 
-        foreach ($overrides as $propertyName => $override) {
-            $component->setProperty($propertyName, $override[1]);
-            $component->setExternalPropertyName($propertyName, $override[0]);
+            if ($override = $this->makeDynamicAttributeReplacement($propValue, $vars)) {
+                [$paramName, $newValue] = $override;
+                $component->setProperty($propPrefix.$propName, $newValue);
+                $component->setExternalPropertyName($propPrefix.$propName, $paramName);
+            }
         }
     }
 
     /**
      * parseEnvironmentVarsOnTemplate where property values should be defined as {{ param }}.
      */
-    protected function parseEnvironmentVarsOnTemplate(CmsObject $template)
+    protected function parseEnvironmentVarsOnTemplate(CmsObject $template, array $vars = [], array $attributes = null, string $attrPrefix = '')
     {
-        $attributes = $template->getParsableAttributeValues();
+        $attributes = $attributes ?: $template->getParsableAttributeValues();
 
-        // Apply environment variables
-        $overrides = $this->makeDynamicAttributeReplacements($attributes, $this->vars);
+        foreach ($attributes as $attrName => $attrValue) {
+            if (is_array($attrValue)) {
+                $this->parseEnvironmentVarsOnTemplate($template, $vars, $attrValue, $attrName.'.');
+                continue;
+            }
 
-        foreach ($overrides as $attrName => $override) {
-            $template->setParsableAttribute($attrName, $override[1]);
+            if ($override = $this->makeDynamicAttributeReplacement($attrValue, $vars)) {
+                [$paramName, $newValue] = $override;
+                $template->setParsableAttribute($attrPrefix.$attrName, $newValue);
+            }
         }
     }
 
     /**
-     * makeRouterPropertyReplacements will look inside property values to replace any
+     * makeRouterPropertyReplacement will look inside property values to replace any
      * Twig-like variables with values from the route parameters.
      *
      *     {{ :post }}
      */
-    protected function makeRouterPropertyReplacements($properties, array $routerParameters = [])
+    protected function makeRouterPropertyReplacement($propertyValue, array $routerParameters = []): ?array
     {
-        $result = [];
-
-        foreach ($properties as $propertyName => $propertyValue) {
-            if (is_array($propertyValue)) {
-                continue;
-            }
-
-            $matches = [];
-            if (preg_match('/^\{\{(\s*:[^\}]+)\}\}$/', $propertyValue, $matches)) {
-                $paramName = trim($matches[1]);
-                $routeParamName = substr($paramName, 1);
-                $newPropertyValue = $routerParameters[$routeParamName] ?? null;
-                $result[$propertyName] = [$paramName, $newPropertyValue];
-            }
+        $matches = [];
+        if (preg_match('/^\{\{(\s*:[^\}]+)\}\}$/', $propertyValue, $matches)) {
+            $paramName = trim($matches[1]);
+            $routeParamName = substr($paramName, 1);
+            $newPropertyValue = $routerParameters[$routeParamName] ?? null;
+            return [$paramName, $newPropertyValue];
         }
 
-        return $result;
+        return null;
     }
 
     /**
-     * makeDynamicAttributeReplacements will look inside attribute values to replace any
+     * makeDynamicAttributeReplacement will look inside attribute values to replace any
      * Twig-like variables with the values inside the parameters.
      *
      *     {{ post.title }}
      */
-    protected function makeDynamicAttributeReplacements($attributes, array $parameters = [])
+    protected function makeDynamicAttributeReplacement($attrValue, array $parameters = []): ?array
     {
-        $result = [];
+        $matches = [];
+        if (preg_match_all('/\{\{([^:\}]+)\}\}/', $attrValue, $matches)) {
+            $newAttrValue = $attrValue;
+            $lastParamName = null;
 
-        foreach ($attributes as $attrName => $attrValue) {
-            if (is_array($attrValue)) {
-                continue;
+            foreach ($matches[1] as $key => $paramName) {
+                $paramName = $lastParamName = trim($paramName);
+                $replaceWith = array_get($parameters, $paramName);
+                $toReplace = $matches[0][$key];
+                $newAttrValue = str_replace($toReplace, $replaceWith, $newAttrValue);
             }
 
-            $matches = [];
-            if (preg_match_all('/\{\{([^:\}]+)\}\}/', $attrValue, $matches)) {
-                $newAttrValue = $attrValue;
-                $lastParamName = null;
-
-                foreach ($matches[1] as $key => $paramName) {
-                    $paramName = $lastParamName = trim($paramName);
-                    $replaceWith = array_get($parameters, $paramName);
-                    $toReplace = $matches[0][$key];
-                    $newAttrValue = str_replace($toReplace, $replaceWith, $newAttrValue);
-                }
-
-                $result[$attrName] = [$lastParamName, $newAttrValue];
-            }
+            return [$lastParamName, $newAttrValue];
         }
 
-        return $result;
+        return null;
     }
 }

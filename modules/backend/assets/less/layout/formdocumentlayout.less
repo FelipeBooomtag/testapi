@@ -155,9 +155,10 @@
                 &:after {
                     .icon-OctoFont();
                     content: @octo-icon-angle-down;
+                    position: relative;
                     font-size: 16px;
                     vertical-align: middle;
-                    margin-left: 8px;
+                    margin-left: 3px;
                     margin-right: -4px;
                 }
             }
@@ -165,19 +166,86 @@
             &.record-status-button {
                 padding-left: 35px;
                 border: 1px solid #ecf0f1;
+                overflow: hidden;
 
-                &:before {
-                    content: '';
+                span {
+                    position: relative;
+                }
+
+                em {
+                    color: @text-muted;
+                    font-size: 12px;
+                    font-style: normal;
+                }
+
+                i {
+                    display: block;
                     width: 10px;
                     height: 10px;
-                    border-radius: 8px;
+                    border-radius: 100%;
                     position: absolute;
                     left: 13px;
                     top: 13px;
+
+                    transition: 0.3s width, 0.3s height, 0.3s left, 0.3s top, 0.3s background-color;
                 }
 
-                &.record-status-hidden:before {
-                    background: #bdc3c7;
+                &.status-published {
+                    border-color: rgba(255, 255, 255, 0.01);
+
+                    span, &:after {
+                        color: white;
+                    }
+
+                    em {
+                        color: rgba(255, 255, 255, 0.7);
+                    }
+
+                    &:before {
+                        content: '';
+                        display: block;
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 100%;
+                        position: absolute;
+                        left: 13px;
+                        top: 13px;
+                        background: white;
+                        z-index: 1;
+                    }
+
+                    i {
+                        width: 500px;
+                        height: 500px;
+                        left: -250px;
+                        top: -250px;
+                    }
+                }
+
+                &.status-draft {
+                    border-color: rgba(255, 255, 255, 0.01);
+                    padding-left: 15px;
+
+                    i {
+                        width: 500px;
+                        height: 500px;
+                        left: -250px;
+                        top: -250px;
+                    }
+
+                    span, &:after {
+                        color: white;
+                    }
+
+                    &:before {
+                        display: none;
+                    }
+
+                    &.status-initial-draft {
+                        i {
+                            background: #46B3A5!important;
+                        }
+                    }
                 }
             }
 

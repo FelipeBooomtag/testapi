@@ -20,20 +20,18 @@ trait ParsableAttributes
     protected $parsableAttributes = [];
 
     /**
-     * offsetGet will leverage Twig's workflow where array access is first in line.
+     * __get with parsable attribute override.
      */
-    public function offsetGet($offset): mixed
+    public function __get($key)
     {
-        $value = parent::offsetGet($offset);
-
         if (
-            in_array($offset, $this->parsable) &&
-            isset($this->parsableAttributes[$offset])
+            in_array($key, $this->parsable) &&
+            isset($this->parsableAttributes[$key])
         ) {
-            return $this->parsableAttributes[$offset];
+            return $this->parsableAttributes[$key];
         }
 
-        return $value;
+        return parent::__get($key);
     }
 
     /**
@@ -53,7 +51,7 @@ trait ParsableAttributes
      */
     public function setParsableAttribute(string $key, $value): void
     {
-        $this->parsableAttributes[$key] = $value;
+        array_set($this->parsableAttributes, $key, $value);
     }
 
     /**

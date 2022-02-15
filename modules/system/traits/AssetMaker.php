@@ -1,5 +1,6 @@
 <?php namespace System\Traits;
 
+use App;
 use Url;
 use Html;
 use File;
@@ -301,7 +302,10 @@ trait AssetMaker
         if (isset($asset['attributes']['build'])) {
             $build = $asset['attributes']['build'];
 
-            if ($build === 'core') {
+            if (!App::runningInBackend()) {
+                $build = '';
+            }
+            elseif ($build === 'core') {
                 $build = 'v' . Backend::assetVersion();
             }
             elseif ($pluginVersion = PluginVersion::getVersion($build)) {

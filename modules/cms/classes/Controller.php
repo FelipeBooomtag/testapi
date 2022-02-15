@@ -22,9 +22,7 @@ use Cms\Twig\Extension as CmsTwigExtension;
 use Cms\Models\MaintenanceSetting;
 use System\Models\RequestLog;
 use System\Helpers\View as ViewHelper;
-use System\Classes\CombineAssets;
 use System\Twig\Extension as SystemTwigExtension;
-use System\Twig\SecurityPolicy;
 use October\Rain\Exception\AjaxException;
 use October\Rain\Exception\ValidationException;
 use October\Rain\Parse\Bracket as TextParser;
@@ -423,7 +421,7 @@ class Controller
              */
             CmsException::mask($this->page, 400);
             $this->loader->setObject($this->page);
-            $template = $this->twig->loadTemplate($this->page->getFilePath());
+            $template = $this->twig->load($this->page->getFilePath());
             $this->pageContents = $template->render($this->vars);
             CmsException::unmask();
         }
@@ -433,7 +431,7 @@ class Controller
          */
         CmsException::mask($this->layout, 400);
         $this->loader->setObject($this->layout);
-        $template = $this->twig->loadTemplate($this->layout->getFilePath());
+        $template = $this->twig->load($this->layout->getFilePath());
         $result = $template->render($this->vars);
         CmsException::unmask();
 
@@ -614,7 +612,14 @@ class Controller
         $twig = new TwigEnvironment($loader, $options);
         $twig->addExtension(new CmsTwigExtension($this));
         $twig->addExtension(new SystemTwigExtension);
-        $twig->addExtension(new SandboxExtension(new SecurityPolicy, true));
+
+        // @deprecated v2 should be default
+        if (env('CMS_SECURITY_POLICY_V2', false)) {
+            $twig->addExtension(new SandboxExtension(new \System\Twig\SecurityPolicyV2, true));
+        }
+        else {
+            $twig->addExtension(new SandboxExtension(new \System\Twig\SecurityPolicy, true));
+        }
 
         if ($isDebugMode) {
             $twig->addExtension(new DebugExtension($this));
@@ -1096,7 +1101,7 @@ class Controller
 
                 $this->partialStack->addComponent($alias, $componentObj);
 
-                $this->parseRouteParamsOnComponent($componentObj);
+                $this->parseRouteParamsOnComponent($componentObj, $this->router->getParameters());
 
                 $componentObj->init();
 
@@ -1120,7 +1125,7 @@ class Controller
          */
         CmsException::mask($partial, 400);
         $this->loader->setObject($partial);
-        $template = $this->twig->loadTemplate($partial->getFilePath());
+        $template = $this->twig->load($partial->getFilePath());
         $partialContent = $template->render(array_merge($this->vars, $parameters));
         CmsException::unmask();
 
@@ -1517,7 +1522,7 @@ class Controller
 
         $this->vars[$alias] = $componentObj->makePrimaryAccessor();
 
-        $this->parseRouteParamsOnComponent($componentObj);
+        $this->parseRouteParamsOnComponent($componentObj, $this->router->getParameters());
 
         $componentObj->init();
 

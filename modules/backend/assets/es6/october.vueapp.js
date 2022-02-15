@@ -59,7 +59,7 @@ $.oc.module.register('backend.october.vueapp', function () {
          */
         async onCommand(command, isHotkey, ev, targetElement, customData) {
             let parts = command.split(':');
-            if (parts.length !== 2 && parts[0] !== 'form') {
+            if (parts.length == 2 && parts[0] !== 'form') {
                 throw new Error('Unknown command: ' + command);
             }
 
@@ -85,13 +85,23 @@ $.oc.module.register('backend.october.vueapp', function () {
                 });
         }
 
+        isFormCommand(command) {
+            let parts = command.split(':');
+            return parts.length === 2 && parts[0] === 'form';
+        }
+
         ajaxRequest(element, handler, requestData) {
             return new Promise(function (resolve, reject, onCancel) {
-                let requestParams = Object.assign({}, requestData, {
-                    error: data => reject(data)
-                });
+                const request = $(element).request(handler, requestData);
 
-                const request = $(element).request(handler, requestParams);
+                if (request.fail) {
+                    request.fail(
+                        function (data) {
+                            reject(data);
+                        }
+                    );
+                }
+
                 if (request.done) {
                     request.done(
                         function (data) {

@@ -4,7 +4,7 @@
     <?= $titleFrom ? 'data-title-from="'.$titleFrom.'"' : '' ?>
     <?= $minItems ? 'data-min-items="'.$minItems.'"' : '' ?>
     <?= $maxItems ? 'data-max-items="'.$maxItems.'"' : '' ?>
-    <?= $style ? 'data-style="'.$style.'"' : '' ?>
+    <?php /* @deprecated */ ?><?= $style ? 'data-style="'.$style.'"' : '' ?>
     data-display-mode="<?= $displayMode ?>"
     data-use-reorder="<?= $showReorder ?>"
     data-sortable-handle=".<?= $this->getId('items') ?>-handle"

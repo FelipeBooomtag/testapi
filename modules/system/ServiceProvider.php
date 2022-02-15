@@ -22,7 +22,6 @@ use System\Classes\SettingsManager;
 use System\Twig\Engine as TwigEngine;
 use System\Twig\Loader as TwigLoader;
 use System\Twig\Extension as TwigExtension;
-use System\Twig\SecurityPolicy as TwigSecurityPolicy;
 use Backend\Classes\WidgetManager;
 use October\Rain\Support\ModuleServiceProvider;
 use Illuminate\Pagination\Paginator;
@@ -94,12 +93,11 @@ class ServiceProvider extends ModuleServiceProvider
             }
         }
 
-        Paginator::useBootstrapThree();
+        // Set pagination views
+        Paginator::defaultSimpleView('system::pagination.default');
         Paginator::defaultSimpleView('system::pagination.simple-default');
 
-        /*
-         * Boot plugins
-         */
+        // Boot plugins
         PluginManager::instance()->bootAll();
 
         parent::boot('system');
@@ -283,7 +281,15 @@ class ServiceProvider extends ModuleServiceProvider
         App::singleton('twig.environment', function ($app) {
             $twig = new TwigEnvironment(new TwigLoader, ['auto_reload' => true]);
             $twig->addExtension(new TwigExtension);
-            $twig->addExtension(new SandboxExtension(new TwigSecurityPolicy, true));
+
+            // @deprecated v2 should be default
+            if (env('CMS_SECURITY_POLICY_V2', false)) {
+                $twig->addExtension(new SandboxExtension(new \System\Twig\SecurityPolicyV2, true));
+            }
+            else {
+                $twig->addExtension(new SandboxExtension(new \System\Twig\SecurityPolicy, true));
+            }
+
             return $twig;
         });
 
@@ -293,7 +299,15 @@ class ServiceProvider extends ModuleServiceProvider
         App::singleton('twig.environment.mailer', function ($app) {
             $twig = new TwigEnvironment(new TwigLoader, ['auto_reload' => true]);
             $twig->addExtension(new TwigExtension);
-            $twig->addExtension(new SandboxExtension(new TwigSecurityPolicy, true));
+
+            // @deprecated v2 should be default
+            if (env('CMS_SECURITY_POLICY_V2', false)) {
+                $twig->addExtension(new SandboxExtension(new \System\Twig\SecurityPolicyV2, true));
+            }
+            else {
+                $twig->addExtension(new SandboxExtension(new \System\Twig\SecurityPolicy, true));
+            }
+
             $twig->addTokenParser(new \System\Twig\MailPartialTokenParser);
             return $twig;
         });

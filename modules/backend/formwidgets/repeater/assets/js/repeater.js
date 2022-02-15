@@ -54,8 +54,7 @@
         displayMode: 'simple',
         titleFrom: null,
         minItems: null,
-        maxItems: null,
-        style: 'default'
+        maxItems: null
     }
 
     Repeater.prototype.init = function() {
@@ -91,6 +90,8 @@
 
         this.countItems();
         this.togglePrompt();
+
+        // @deprecated
         this.applyStyle();
     }
 
@@ -390,6 +391,7 @@
         return defaultText;
     }
 
+    // @deprecated
     Repeater.prototype.getStyle = function() {
         var style = 'default';
 
@@ -401,6 +403,7 @@
         return style;
     }
 
+    // @deprecated
     Repeater.prototype.applyStyle = function() {
         var style = this.getStyle(),
             items = $(this.$el).children('.field-repeater-items').children('.field-repeater-item'),

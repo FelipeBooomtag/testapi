@@ -125,11 +125,13 @@ class Resources extends ComponentBase
         }
 
         // Variables
-        if ($vars = $this->property('vars')) {
-            foreach ((array) $vars as $key => $value) {
-                $this->page[$key] = $value;
+        $this->controller->bindEvent('page.beforeRenderPage', function ($page) {
+            if ($vars = $this->property('vars')) {
+                foreach ((array) $vars as $key => $value) {
+                    $this->page[$key] = $value;
+                }
             }
-        }
+        });
     }
 
     /**

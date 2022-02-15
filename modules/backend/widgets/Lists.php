@@ -585,7 +585,7 @@ class Lists extends WidgetBase implements ListElement
         $query = $this->prepareQuery();
 
         if ($this->showPagination) {
-            $method = $this->showPageNumbers ? 'paginate' : 'simplePaginate';
+            $method = $this->showPageNumbers ? 'paginateAtPage' : 'simplePaginateAtPage';
             $currentPageNumber = $this->getCurrentPageNumber($query);
             $records = $query->{$method}($this->recordsPerPage, $currentPageNumber);
         }
@@ -1381,7 +1381,7 @@ class Lists extends WidgetBase implements ListElement
         $image = null;
 
         if (isset($record->attachMany[$colName])) {
-            $image = $value->first();
+            $image = $value ? $value->first() : null;
         }
         elseif (isset($record->attachOne[$colName])) {
             $image = $value;

@@ -131,7 +131,7 @@ Vue.component('backend-component-document-toolbar-button', {
                 this.$emit('command', this.settings.emitCommandBeforeMenu, isHotkey, ev, this.$el, this.settings.customData);
             }
 
-            this.$refs.menu.showMenu();
+            this.$refs.menu.showMenu(this.settings.type == 'dropdown' ? this.$refs.button : this.$refs.menuButton);
             return false;
         },
 
@@ -143,7 +143,7 @@ Vue.component('backend-component-document-toolbar-button', {
         },
 
         onMenuItemCommand: function onMenuItemCommand(command) {
-            this.$emit('command', command, false, null, this.$e);
+            this.$emit('command', command, false, null, this.$el);
         },
 
         onMenuShown: function onMenuShown() {

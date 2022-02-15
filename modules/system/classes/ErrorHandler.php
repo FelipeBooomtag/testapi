@@ -8,6 +8,9 @@ use Cms\Classes\Controller as CmsController;
 use October\Rain\Exception\ErrorHandler as ErrorHandlerBase;
 use October\Rain\Exception\ApplicationException;
 use October\Rain\Exception\SystemException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
+use Exception;
 
 /**
  * ErrorHandler handles application exception events
@@ -20,18 +23,31 @@ class ErrorHandler extends ErrorHandlerBase
     /**
      * @inheritDoc
      */
-    // public function handleException(\Exception $proposedException)
-    // {
-    //     // The Twig runtime error is not very useful
-    //     if (
-    //         $proposedException instanceof \Twig\Error\RuntimeError &&
-    //         ($previousException = $proposedException->getPrevious()) &&
-    //         (!$previousException instanceof \Cms\Classes\CmsException)
-    //     ) {
-    //         $proposedException = $previousException;
-    //     }
-    //     return parent::handleException($proposedException);
-    // }
+    public function handleException(Throwable $proposedException)
+    {
+        if (
+            $proposedException instanceof \Twig\Error\RuntimeError &&
+            ($previousException = $proposedException->getPrevious())
+        ) {
+            // The Twig runtime error is not very useful sometimes, so
+            // uncomment this for an alternative debugging option
+            // if (!$previousException instanceof \Cms\Classes\CmsException) {
+            //     $proposedException = $previousException;
+            // }
+
+            // Convert HTTP exceptions
+            if ($previousException instanceof HttpException) {
+                $proposedException = $previousException;
+            }
+
+            // Convert Not Found exceptions
+            if ($this->isNotFoundException($previousException)) {
+                $proposedException = $previousException;
+            }
+        }
+
+        return parent::handleException($proposedException);
+    }
 
     /**
      * beforeHandleError happens when we are about to display an error page to the user,

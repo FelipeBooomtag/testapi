@@ -83,7 +83,7 @@ $.oc.module.register('backend.october.vueapp', function () {
                                 case 0:
                                     parts = command.split(':');
 
-                                    if (!(parts.length !== 2 && parts[0] !== 'form')) {
+                                    if (!(parts.length == 2 && parts[0] !== 'form')) {
                                         _context.next = 3;
                                         break;
                                     }
@@ -139,16 +139,23 @@ $.oc.module.register('backend.october.vueapp', function () {
                 return onCommand;
             }()
         }, {
+            key: 'isFormCommand',
+            value: function isFormCommand(command) {
+                var parts = command.split(':');
+                return parts.length === 2 && parts[0] === 'form';
+            }
+        }, {
             key: 'ajaxRequest',
             value: function ajaxRequest(element, handler, requestData) {
                 return new Promise(function (resolve, reject, onCancel) {
-                    var requestParams = Object.assign({}, requestData, {
-                        error: function error(data) {
-                            return reject(data);
-                        }
-                    });
+                    var request = $(element).request(handler, requestData);
 
-                    var request = $(element).request(handler, requestParams);
+                    if (request.fail) {
+                        request.fail(function (data) {
+                            reject(data);
+                        });
+                    }
+
                     if (request.done) {
                         request.done(function (data) {
                             resolve(data);

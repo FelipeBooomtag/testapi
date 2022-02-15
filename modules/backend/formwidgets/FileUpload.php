@@ -149,6 +149,7 @@ class FileUpload extends FormWidgetBase
             throw new ApplicationException('Maximum allowed size for uploaded files: ' . $maxPhpSetting);
         }
 
+        $this->vars['size'] = $this->formField->size;
         $this->vars['fileList'] = $fileList = $this->getFileList();
         $this->vars['singleFile'] = $fileList->first();
         $this->vars['displayMode'] = $this->getDisplayMode();
@@ -159,7 +160,6 @@ class FileUpload extends FormWidgetBase
         $this->vars['maxFilesize'] = $this->maxFilesize;
         $this->vars['maxFiles'] = $this->maxFiles;
         $this->vars['cssDimensions'] = $this->getCssDimensions();
-        $this->vars['cssBlockDimensions'] = $this->getCssDimensions('block');
         $this->vars['useCaption'] = $this->useCaption;
     }
 
@@ -241,9 +241,8 @@ class FileUpload extends FormWidgetBase
     /**
      * getCssDimensions returns the CSS dimensions for the uploaded image,
      * uses auto where no dimension is provided.
-     * @param string $mode
      */
-    protected function getCssDimensions($mode = null): string
+    protected function getCssDimensions(): string
     {
         if (!$this->imageWidth && !$this->imageHeight) {
             return '';
@@ -251,23 +250,12 @@ class FileUpload extends FormWidgetBase
 
         $cssDimensions = '';
 
-        if ($mode == 'block') {
-            $cssDimensions .= $this->imageWidth
-                ? 'width: '.$this->imageWidth.'px;'
-                : 'width: '.$this->imageHeight.'px;';
-
-            $cssDimensions .= ($this->imageHeight)
-                ? 'max-height: '.$this->imageHeight.'px;'
-                : 'height: auto;';
+        if ($this->imageWidth && !$this->imageHeight) {
+            $cssDimensions .= 'width: '.$this->imageWidth.'px;';
         }
-        else {
-            $cssDimensions .= $this->imageWidth
-                ? 'width: '.$this->imageWidth.'px;'
-                : 'width: auto;';
 
-            $cssDimensions .= ($this->imageHeight)
-                ? 'max-height: '.$this->imageHeight.'px;'
-                : 'height: auto;';
+        if ($this->imageHeight && !$this->imageWidth) {
+            $cssDimensions .= 'height: '.$this->imageHeight.'px;';
         }
 
         return $cssDimensions;
