@@ -22,6 +22,16 @@ class Movie extends Model
     public $table = 'test_movies_';
 
 
+    public $belongsToMany= [
+
+        'genres' => [
+            'Test\Movies\Models\Genre', 
+            'table' => 'test_movies_movies_genres',
+            'order' => 'genre_title'
+        ]
+
+    ];
+
     // relations fileupload
 
     public $attachOne = [

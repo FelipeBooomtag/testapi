@@ -23,6 +23,20 @@ notFoundMessage = "Record not found"
     <h3>description</h3>
 
     {{ record.description|raw }}
+
+    {% for image in record.movie_gallery %}
+
+    <img src="{{ image.thumb(80,80, {'mode':'crop'}) }}">
+
+    {% endfor %}
+
+    <h3>Genres</h3>
+    {% for genre in record.genres %}
+
+    {{ genre.genre_title }}<br>
+
+    {% endfor %}
+
 {% else %}
     {{ notFoundMessage }}
 {% endif %}

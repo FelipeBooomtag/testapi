@@ -1,0 +1,4 @@
+title: Genres
+modelClass: Test\Movies\Models\Genre
+toolbar:
+    buttons: reorder_toolbar

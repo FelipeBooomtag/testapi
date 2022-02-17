@@ -7,5 +7,14 @@ plugin:
 navigation:
     main-menu-item:
         label: Movies
-        url: test/movies/movies
+        url: /
         icon: icon-video-camera
+        sideMenu:
+            side-menu-item:
+                label: Movies
+                url: test/movies/movies
+                icon: icon-video-camera
+            side-menu-item2:
+                label: Genres
+                url: test/movies/genres
+                icon: icon-tag

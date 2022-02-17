@@ -26,7 +26,7 @@ pageNumber = "{{ :page }}"
         <li>
             <h3>
                 {# Use spaceless tag to remove spaces inside the A tag. #}
-                {% spaceless %}
+                {# spaceless #}
                     {% if detailsPage %}
                         <a href="{{ detailsPage|page({ (detailsUrlParameter): attribute(record, detailsKeyColumn) }) }}">
                     {% endif %}
@@ -36,7 +36,7 @@ pageNumber = "{{ :page }}"
                     {% if detailsPage %}
                         </a>
                     {% endif %}
-                {% endspaceless %}
+                {# endspaceless #}
             </h3>
 
             <!-- Zet |raw neer voor het weergeven van de tekst met normale htmlmarkup -->
