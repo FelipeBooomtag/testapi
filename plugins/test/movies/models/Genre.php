@@ -21,6 +21,16 @@ class Genre extends Model
      */
     public $table = 'test_movies_genres';
 
+    public $belongsToMany= [
+
+        'movies' => [
+            'Test\Movies\Models\Movie', 
+            'table' => 'test_movies_movies_genres',
+            'order' => 'name'
+        ]
+
+    ];
+
     /**
      * @var array Validation rules
      */

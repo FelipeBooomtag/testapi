@@ -12,3 +12,6 @@
 1.0.5:
     - 'Created table test_movies_movies_genres'
     - builder_table_create_test_movies_movies_genres.php
+1.0.6:
+    - 'Updated table test_movies_'
+    - builder_table_update_test_movies__2.php

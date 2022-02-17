@@ -32,6 +32,8 @@ class Movie extends Model
 
     ];
 
+    protected $jsonable = ['actors'];
+
     // relations fileupload
 
     public $attachOne = [
@@ -45,6 +47,7 @@ class Movie extends Model
         'movie_gallery' => 'System\Models\File'
 
     ];
+
 
     /**
      * @var array Validation rules

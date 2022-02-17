@@ -20,9 +20,17 @@ notFoundMessage = "Record not found"
 
     <h4>{{ record.year }}</h4>
 
-    <h3>description</h3>
+    <h3>description jahah</h3>
 
     {{ record.description|raw }}
+
+    <h2>Actors</h2>
+
+    {% for actor in record.actors %}
+        
+        {{ actor.actor_name }} <br>
+
+    {% endfor %}
 
     {% for image in record.movie_gallery %}
 
@@ -33,7 +41,7 @@ notFoundMessage = "Record not found"
     <h3>Genres</h3>
     {% for genre in record.genres %}
 
-    {{ genre.genre_title }}<br>
+    <a href="/genres/{{ genre.slug }}">{{ genre.genre_title }}</a><br>
 
     {% endfor %}
 
